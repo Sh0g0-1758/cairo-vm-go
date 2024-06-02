@@ -212,6 +212,142 @@ func TestZeroHintUint256(t *testing.T) {
 				check: apValueEquals(feltUint64(1)),
 			},
 		},
+		"Uint256TaskOne": {
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "SHIFT", Kind: fpRelative, Value: feltUint64(45)},
+					{Name: "res", Kind: uninitialized},
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
+				},
+				check: allVarValueEquals(map[string]*fp.Element{
+					"res": feltUint64(0),
+				}),
+			},
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: feltUint64(42)},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(10)},
+					{Name: "SHIFT", Kind: fpRelative, Value: feltUint64(4242)},
+					{Name: "res", Kind: uninitialized},
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
+				},
+				check: allVarValueEquals(map[string]*fp.Element{
+					"res": feltUint64(1),
+				}),
+			},
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: &utils.Felt127},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "SHIFT", Kind: fpRelative, Value: &utils.Felt127},
+					{Name: "res", Kind: uninitialized},
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
+				},
+				check: allVarValueEquals(map[string]*fp.Element{
+					"res": feltUint64(1),
+				}),
+			},
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: feltUint64(42)},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "SHIFT", Kind: fpRelative, Value: &utils.Felt127},
+					{Name: "res", Kind: uninitialized},
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
+				},
+				check: allVarValueEquals(map[string]*fp.Element{
+					"res": feltUint64(0),
+				}),
+			},
+		},
+		"Uint256TaskTwo": {
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "res", Kind: uninitialized},
+				},
+				ctxInit: func(ctx *hinter.HintRunnerContext) {
+					ctx.ScopeManager.EnterScope(map[string]any{
+						"n": &utils.FeltOne,
+					})
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
+				},
+				check: func(t *testing.T, ctx *hintTestContext) {
+					allVarValueInScopeEquals(map[string]any{"n": feltInt64(0)})(t, ctx)
+					varValueEquals("res", feltInt64(0))(t, ctx)
+				},
+			},
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: feltUint64(42)},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(10)},
+					{Name: "res", Kind: uninitialized},
+				},
+				ctxInit: func(ctx *hinter.HintRunnerContext) {
+					ctx.ScopeManager.EnterScope(map[string]any{
+						"n": feltUint64(42),
+					})
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
+				},
+				check: func(t *testing.T, ctx *hintTestContext) {
+					allVarValueInScopeEquals(map[string]any{"n": feltInt64(41)})(t, ctx)
+					varValueEquals("res", feltInt64(1))(t, ctx)
+				},
+			},
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: &utils.Felt127},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "res", Kind: uninitialized},
+				},
+				ctxInit: func(ctx *hinter.HintRunnerContext) {
+					ctx.ScopeManager.EnterScope(map[string]any{
+						"n": feltUint64(100),
+					})
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
+				},
+				check: func(t *testing.T, ctx *hintTestContext) {
+					allVarValueInScopeEquals(map[string]any{"n": feltInt64(99)})(t, ctx)
+					varValueEquals("res", feltInt64(1))(t, ctx)
+				},
+			},
+			{
+				operanders: []*hintOperander{
+					{Name: "a.low", Kind: fpRelative, Value: feltUint64(42)},
+					{Name: "a.high", Kind: fpRelative, Value: feltUint64(0)},
+					{Name: "res", Kind: uninitialized},
+				},
+				ctxInit: func(ctx *hinter.HintRunnerContext) {
+					ctx.ScopeManager.EnterScope(map[string]any{
+						"n": feltUint64(107),
+					})
+				},
+				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
+					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
+				},
+				check: func(t *testing.T, ctx *hintTestContext) {
+					allVarValueInScopeEquals(map[string]any{"n": feltInt64(106)})(t, ctx)
+					varValueEquals("res", feltInt64(0))(t, ctx)
+				},
+			},
+		},
 		"Uint256UnsignedDivRem": {
 			{
 				operanders: []*hintOperander{

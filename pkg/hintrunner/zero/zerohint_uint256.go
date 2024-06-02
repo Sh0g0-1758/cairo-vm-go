@@ -10,6 +10,7 @@ import (
 	"github.com/NethermindEth/cairo-vm-go/pkg/vm/memory"
 	"github.com/consensys/gnark-crypto/ecc/stark-curve/fp"
 	"github.com/holiman/uint256"
+	f "github.com/consensys/gnark-crypto/ecc/stark-curve/fp"
 )
 
 // Uint256Add hint computes the sum of the `low` and `high` parts of
@@ -515,4 +516,136 @@ func createUint256MulDivModHinter(resolver hintReferenceResolver) (hinter.Hinter
 	}
 
 	return newUint256MulDivModHint(a, b, div, quotientLow, quotientHigh, remainder), nil
+}
+
+// Uint256TaskOne hint checks if a `uint256` variable is greater than or equal to a `felt`
+// and stores the result in a memory address
+//
+// `newUint256TaskOneHint` takes 3 operanders as arguments
+//  - `a` is the `uint256` variable that will be checked
+//  - `SHIFT` is the `felt` value that will be compared with `a`
+//  - `res` is the variable that will store the result of the hint in memory
+func newUint256TaskOneHint(a,SHIFT,res hinter.ResOperander) hinter.Hinter {
+	return &GenericZeroHinter{
+		Name: "Uint256TaskOne",
+		Op: func(vm *VM.VirtualMachine, _ *hinter.HintRunnerContext) error {
+			//> a = (ids.a.high << 128) + ids.a.low
+			//> SHIFT = CONSTANT 2**128
+			//> res = 1 if a >= SHIFT else 0
+			aLow, aHigh, err := GetUint256AsFelts(vm, a)
+			if err != nil {
+				return err
+			}
+
+			SHIFT, err := hinter.ResolveAsFelt(vm, SHIFT)
+			if err != nil {
+				return err
+			}
+			
+			resAddr, err := res.GetAddress(vm)
+			if err != nil {
+				return err
+			}
+			var v memory.MemoryValue
+
+			if utils.FeltLt(aHigh, &utils.FeltOne) {
+				if(utils.FeltLt(aLow, SHIFT)){
+					v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
+				} else {
+					v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
+				}
+			} else {
+				v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
+			}
+
+			return vm.Memory.WriteToAddress(&resAddr, &v)
+		},
+	}
+}
+
+func createUint256TaskOneHinter(resolver hintReferenceResolver) (hinter.Hinter, error) {
+	a, err := resolver.GetResOperander("a")
+	if err != nil {
+		return nil, err
+	}
+
+	SHIFT, err := resolver.GetResOperander("SHIFT")
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := resolver.GetResOperander("res")
+	if err != nil {
+		return nil, err
+	}
+
+	return newUint256TaskOneHint(a,SHIFT,res), nil
+}
+
+// Uint256TaskTwo hint checks if a `uint256` variable is greater than or equal to a ` hint variable`
+// and stores the result in a memory address
+//
+// `newUint256TaskTwoHint` takes 2 operanders as arguments
+//  - `a` is the `uint256` variable that will be checked
+//  - `res` is the variable that will store the result of the hint in memory
+func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
+	return &GenericZeroHinter{
+		Name: "Uint256TaskTwo",
+		Op: func(vm *VM.VirtualMachine, ctx *hinter.HintRunnerContext) error {
+			//> a = (ids.a.high << 128) + ids.a.low
+			//> n = prior hint variable
+			//> res = 1 if a >= SHIFT else 0
+			aLow, aHigh, err := GetUint256AsFelts(vm, a)
+			if err != nil {
+				return err
+			}
+
+			n, err := ctx.ScopeManager.GetVariableValue("n")
+			if err != nil {
+				return err
+			}
+
+			newN := new(f.Element)
+			newN = newN.Sub(n.(*f.Element), &utils.FeltZero)
+			
+			resAddr, err := res.GetAddress(vm)
+			if err != nil {
+				return err
+			}
+			
+			var v memory.MemoryValue
+			
+			if utils.FeltLt(aHigh, &utils.FeltOne) {
+				if(utils.FeltLt(aLow, newN)){
+					v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
+				} else {
+					v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
+				}
+			} else {
+				v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
+			}
+
+			newN = newN.Sub(n.(*f.Element), &utils.FeltOne)
+
+			if err := ctx.ScopeManager.AssignVariable("n", newN); err != nil {
+				return err
+			}
+				
+			return vm.Memory.WriteToAddress(&resAddr, &v)
+		},
+	}
+}
+
+func createUint256TaskTwoHinter(resolver hintReferenceResolver) (hinter.Hinter, error) {
+	a, err := resolver.GetResOperander("a")
+	if err != nil {
+		return nil, err
+	}
+
+	res, err := resolver.GetResOperander("res")
+	if err != nil {
+		return nil, err
+	}
+
+	return newUint256TaskTwoHint(a,res), nil
 }
