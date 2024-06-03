@@ -10,7 +10,6 @@ import (
 	"github.com/NethermindEth/cairo-vm-go/pkg/vm/memory"
 	"github.com/consensys/gnark-crypto/ecc/stark-curve/fp"
 	"github.com/holiman/uint256"
-	f "github.com/consensys/gnark-crypto/ecc/stark-curve/fp"
 )
 
 // Uint256Add hint computes the sum of the `low` and `high` parts of
@@ -603,8 +602,8 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 				return err
 			}
 
-			newN := new(f.Element)
-			newN.Set(n.(*f.Element))
+			newN := new(fp.Element)
+			newN.Set(n.(*fp.Element))
 			
 			resAddr, err := res.GetAddress(vm)
 			if err != nil {
@@ -619,7 +618,7 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 				v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
 			}
 
-			newN = newN.Sub(n.(*f.Element), &utils.FeltOne)
+			newN = newN.Sub(n.(*fp.Element), &utils.FeltOne)
 
 			if err := ctx.ScopeManager.AssignVariable("n", newN); err != nil {
 				return err
