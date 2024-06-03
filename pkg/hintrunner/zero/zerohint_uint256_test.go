@@ -223,9 +223,7 @@ func TestZeroHintUint256(t *testing.T) {
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
 				},
-				check: allVarValueEquals(map[string]*fp.Element{
-					"res": feltUint64(0),
-				}),
+				check: varValueEquals("res", feltUint64(0)),
 			},
 			{
 				operanders: []*hintOperander{
@@ -237,9 +235,7 @@ func TestZeroHintUint256(t *testing.T) {
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
 				},
-				check: allVarValueEquals(map[string]*fp.Element{
-					"res": feltUint64(1),
-				}),
+				check: varValueEquals("res", feltUint64(1)),
 			},
 			{
 				operanders: []*hintOperander{
@@ -251,9 +247,7 @@ func TestZeroHintUint256(t *testing.T) {
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
 				},
-				check: allVarValueEquals(map[string]*fp.Element{
-					"res": feltUint64(1),
-				}),
+				check: varValueEquals("res", feltUint64(1)),
 			},
 			{
 				operanders: []*hintOperander{
@@ -265,9 +259,7 @@ func TestZeroHintUint256(t *testing.T) {
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskOneHint(ctx.operanders["a.low"], ctx.operanders["SHIFT"], ctx.operanders["res"])
 				},
-				check: allVarValueEquals(map[string]*fp.Element{
-					"res": feltUint64(0),
-				}),
+				check: varValueEquals("res", feltUint64(0)),
 			},
 		},
 		"Uint256TaskTwo": {
@@ -286,8 +278,8 @@ func TestZeroHintUint256(t *testing.T) {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(0)})(t, ctx)
-					varValueEquals("res", feltInt64(0))(t, ctx)
+					varValueInScopeEquals("n", *feltUint64(0))
+					varValueEquals("res", feltInt64(0))
 				},
 			},
 			{
@@ -305,8 +297,8 @@ func TestZeroHintUint256(t *testing.T) {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(41)})(t, ctx)
-					varValueEquals("res", feltInt64(1))(t, ctx)
+					varValueInScopeEquals("n", *feltUint64(41))
+					varValueEquals("res", feltInt64(1))
 				},
 			},
 			{
@@ -324,8 +316,8 @@ func TestZeroHintUint256(t *testing.T) {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(99)})(t, ctx)
-					varValueEquals("res", feltInt64(1))(t, ctx)
+					varValueInScopeEquals("n", *feltUint64(99))
+					varValueEquals("res", feltInt64(1))
 				},
 			},
 			{
@@ -343,8 +335,8 @@ func TestZeroHintUint256(t *testing.T) {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(106)})(t, ctx)
-					varValueEquals("res", feltInt64(0))(t, ctx)
+					varValueInScopeEquals("n", *feltUint64(106))
+					varValueEquals("res", feltInt64(0))
 				},
 			},
 		},
