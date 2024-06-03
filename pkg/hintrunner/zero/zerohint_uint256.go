@@ -524,14 +524,13 @@ func createUint256MulDivModHinter(resolver hintReferenceResolver) (hinter.Hinter
 // `newUint256TaskOneHint` takes 3 operanders as arguments
 //  - `a` is the `uint256` variable that will be checked
 //  - `SHIFT` is the `felt` value that will be compared with `a`
-//  - `res` is the variable that will store the result of the hint in memory
+//  - `res` is the felt variable that will store the result of the hint in memory
 func newUint256TaskOneHint(a,SHIFT,res hinter.ResOperander) hinter.Hinter {
 	return &GenericZeroHinter{
 		Name: "Uint256TaskOne",
 		Op: func(vm *VM.VirtualMachine, _ *hinter.HintRunnerContext) error {
-			//> a = (ids.a.high << 128) + ids.a.low
-			//> SHIFT = CONSTANT 2**128
-			//> res = 1 if a >= SHIFT else 0
+			//> s = ids.a.low + (ids.a.high << 128)
+            //> ids.res = 1 if s >= ids.SHIFT else 0
 			aLow, aHigh, err := GetUint256AsFelts(vm, a)
 			if err != nil {
 				return err
@@ -582,7 +581,7 @@ func createUint256TaskOneHinter(resolver hintReferenceResolver) (hinter.Hinter, 
 	return newUint256TaskOneHint(a,SHIFT,res), nil
 }
 
-// Uint256TaskTwo hint checks if a `uint256` variable is greater than or equal to a ` hint variable`
+// Uint256TaskTwo hint checks if a `uint256` variable is greater than or equal to the variable `n` in the current scope
 // and stores the result in a memory address
 //
 // `newUint256TaskTwoHint` takes 2 operanders as arguments
@@ -592,9 +591,9 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 	return &GenericZeroHinter{
 		Name: "Uint256TaskTwo",
 		Op: func(vm *VM.VirtualMachine, ctx *hinter.HintRunnerContext) error {
-			//> a = (ids.a.high << 128) + ids.a.low
-			//> n = prior hint variable
-			//> res = 1 if a >= SHIFT else 0
+			//> s = ids.a.low + (ids.a.high << 128)
+			//> ids.res = 1 if s >= n else 0
+			//> n -= 1
 			aLow, aHigh, err := GetUint256AsFelts(vm, a)
 			if err != nil {
 				return err
