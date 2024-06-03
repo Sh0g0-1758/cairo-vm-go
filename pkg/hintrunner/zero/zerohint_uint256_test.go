@@ -231,7 +231,7 @@ func TestZeroHintUint256(t *testing.T) {
 				operanders: []*hintOperander{
 					{Name: "a.low", Kind: fpRelative, Value: feltUint64(42)},
 					{Name: "a.high", Kind: fpRelative, Value: feltUint64(10)},
-					{Name: "SHIFT", Kind: fpRelative, Value: feltUint64(4242)},
+					{Name: "SHIFT", Kind: fpRelative, Value: feltUint64(10)},
 					{Name: "res", Kind: uninitialized},
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {

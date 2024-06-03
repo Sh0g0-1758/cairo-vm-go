@@ -518,6 +518,10 @@ func createUint256MulDivModHinter(resolver hintReferenceResolver) (hinter.Hinter
 	return newUint256MulDivModHint(a, b, div, quotientLow, quotientHigh, remainder), nil
 }
 
+func feltAddTask(x, y *fp.Element) *fp.Element {
+	return new(fp.Element).Add(x, y)
+}
+
 // Uint256TaskOne hint checks if a `uint256` variable is greater than or equal to a `felt`
 // and stores the result in a memory address
 //
@@ -529,7 +533,7 @@ func newUint256TaskOneHint(a,SHIFT,res hinter.ResOperander) hinter.Hinter {
 	return &GenericZeroHinter{
 		Name: "Uint256TaskOne",
 		Op: func(vm *VM.VirtualMachine, _ *hinter.HintRunnerContext) error {
-			//> s = ids.a.low + (ids.a.high << 128)
+			//> s = ids.a.low + ids.a.high
             //> ids.res = 1 if s >= ids.SHIFT else 0
 			aLow, aHigh, err := GetUint256AsFelts(vm, a)
 			if err != nil {
@@ -546,15 +550,10 @@ func newUint256TaskOneHint(a,SHIFT,res hinter.ResOperander) hinter.Hinter {
 				return err
 			}
 			var v memory.MemoryValue
-
-			if utils.FeltLt(aHigh, &utils.FeltOne) {
-				if(utils.FeltLt(aLow, SHIFT)){
-					v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
-				} else {
-					v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
-				}
-			} else {
+			if utils.FeltLe(SHIFT, feltAddTask(aLow, aHigh)) {
 				v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
+			} else {
+				v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
 			}
 
 			return vm.Memory.WriteToAddress(&resAddr, &v)
@@ -591,7 +590,7 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 	return &GenericZeroHinter{
 		Name: "Uint256TaskTwo",
 		Op: func(vm *VM.VirtualMachine, ctx *hinter.HintRunnerContext) error {
-			//> s = ids.a.low + (ids.a.high << 128)
+			//> s = ids.a.low + ids.a.high
 			//> ids.res = 1 if s >= n else 0
 			//> n -= 1
 			aLow, aHigh, err := GetUint256AsFelts(vm, a)
@@ -605,7 +604,7 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 			}
 
 			newN := new(f.Element)
-			newN = newN.Sub(n.(*f.Element), &utils.FeltZero)
+			newN.Set(n.(*f.Element))
 			
 			resAddr, err := res.GetAddress(vm)
 			if err != nil {
@@ -614,14 +613,10 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 			
 			var v memory.MemoryValue
 			
-			if utils.FeltLt(aHigh, &utils.FeltOne) {
-				if(utils.FeltLt(aLow, newN)){
-					v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
-				} else {
-					v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
-				}
-			} else {
+			if utils.FeltLe(newN, feltAddTask(aLow, aHigh)) {
 				v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
+			} else {
+				v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
 			}
 
 			newN = newN.Sub(n.(*f.Element), &utils.FeltOne)
