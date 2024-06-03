@@ -521,7 +521,7 @@ func feltAddTask(x, y *fp.Element) *fp.Element {
 	return new(fp.Element).Add(x, y)
 }
 
-// Uint256TaskOne hint checks if a `uint256` variable is greater than or equal to a `felt`
+// Uint256TaskOne hint checks if the sum of the low and high parts of a uint256 variable is greater than or equal to a `felt`
 // and stores the result in a memory address
 //
 // `newUint256TaskOneHint` takes 3 operanders as arguments
@@ -579,7 +579,8 @@ func createUint256TaskOneHinter(resolver hintReferenceResolver) (hinter.Hinter, 
 	return newUint256TaskOneHint(a,SHIFT,res), nil
 }
 
-// Uint256TaskTwo hint checks if a `uint256` variable is greater than or equal to the variable `n` in the current scope
+// Uint256TaskTwo hint checks if the sum of the low and high parts of a uint256 variable
+// is greater than or equal to the variable `n` in the current scope
 // and stores the result in a memory address
 //
 // `newUint256TaskTwoHint` takes 2 operanders as arguments
