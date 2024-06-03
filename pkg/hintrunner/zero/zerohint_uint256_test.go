@@ -270,9 +270,10 @@ func TestZeroHintUint256(t *testing.T) {
 					{Name: "res", Kind: uninitialized},
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
-					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": *feltUint64(1),
-					})
+					err := ctx.ScopeManager.AssignVariable("n", *feltUint64(1))
+					if err != nil {
+						t.Fatal(err)
+					}
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
@@ -289,9 +290,10 @@ func TestZeroHintUint256(t *testing.T) {
 					{Name: "res", Kind: uninitialized},
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
-					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": *feltUint64(42),
-					})
+					err := ctx.ScopeManager.AssignVariable("n", *feltUint64(42))
+					if err != nil {
+						t.Fatal(err)
+					}
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
@@ -308,9 +310,10 @@ func TestZeroHintUint256(t *testing.T) {
 					{Name: "res", Kind: uninitialized},
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
-					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": *feltUint64(100),
-					})
+					err := ctx.ScopeManager.AssignVariable("n", *feltUint64(100))
+					if err != nil {
+						t.Fatal(err)
+					}
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
@@ -327,9 +330,10 @@ func TestZeroHintUint256(t *testing.T) {
 					{Name: "res", Kind: uninitialized},
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
-					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": *feltUint64(107),
-					})
+					err := ctx.ScopeManager.AssignVariable("n", *feltUint64(107))
+					if err != nil {
+						t.Fatal(err)
+					}
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
