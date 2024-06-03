@@ -279,14 +279,14 @@ func TestZeroHintUint256(t *testing.T) {
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
 					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": &utils.FeltOne,
+						"n": *feltUint64(1),
 					})
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": feltInt64(0)})(t, ctx)
+					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(0)})(t, ctx)
 					varValueEquals("res", feltInt64(0))(t, ctx)
 				},
 			},
@@ -298,14 +298,14 @@ func TestZeroHintUint256(t *testing.T) {
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
 					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": feltUint64(42),
+						"n": *feltUint64(42),
 					})
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": feltInt64(41)})(t, ctx)
+					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(41)})(t, ctx)
 					varValueEquals("res", feltInt64(1))(t, ctx)
 				},
 			},
@@ -317,14 +317,14 @@ func TestZeroHintUint256(t *testing.T) {
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
 					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": feltUint64(100),
+						"n": *feltUint64(100),
 					})
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": feltInt64(99)})(t, ctx)
+					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(99)})(t, ctx)
 					varValueEquals("res", feltInt64(1))(t, ctx)
 				},
 			},
@@ -336,14 +336,14 @@ func TestZeroHintUint256(t *testing.T) {
 				},
 				ctxInit: func(ctx *hinter.HintRunnerContext) {
 					ctx.ScopeManager.EnterScope(map[string]any{
-						"n": feltUint64(107),
+						"n": *feltUint64(107),
 					})
 				},
 				makeHinter: func(ctx *hintTestContext) hinter.Hinter {
 					return newUint256TaskTwoHint(ctx.operanders["a.low"], ctx.operanders["res"])
 				},
 				check: func(t *testing.T, ctx *hintTestContext) {
-					allVarValueInScopeEquals(map[string]any{"n": feltInt64(106)})(t, ctx)
+					allVarValueInScopeEquals(map[string]any{"n": *feltUint64(106)})(t, ctx)
 					varValueEquals("res", feltInt64(0))(t, ctx)
 				},
 			},

@@ -602,9 +602,11 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 				return err
 			}
 
-			newN := new(fp.Element)
-			newN.Set(n.(*fp.Element))
-			
+			newN, ok := n.(fp.Element)
+			if !ok {
+				return fmt.Errorf("casting n into a felt failed")
+			}
+
 			resAddr, err := res.GetAddress(vm)
 			if err != nil {
 				return err
@@ -612,15 +614,13 @@ func newUint256TaskTwoHint(a,res hinter.ResOperander) hinter.Hinter {
 			
 			var v memory.MemoryValue
 			
-			if utils.FeltLe(newN, feltAddTask(aLow, aHigh)) {
+			if utils.FeltLe(&newN, feltAddTask(aLow, aHigh)) {
 				v = memory.MemoryValueFromFieldElement(&utils.FeltOne)
 			} else {
 				v = memory.MemoryValueFromFieldElement(&utils.FeltZero)
 			}
 
-			newN = newN.Sub(n.(*fp.Element), &utils.FeltOne)
-
-			if err := ctx.ScopeManager.AssignVariable("n", newN); err != nil {
+			if err := ctx.ScopeManager.AssignVariable("n", *new(fp.Element).Sub(&newN, &utils.FeltOne)); err != nil {
 				return err
 			}
 				
